@@ -69,5 +69,9 @@ describe('TodosService', () => {
       const id = 110;
       expect(() => service.find(id)).toThrow(TodoNotFoundException);
     });
+    it('should throw an NotFoundException because id 500 does not exist', () => {
+      const id = 500;
+      expect(() => service.find(id)).toThrow(TodoNotFoundException);
+    });
   });
 });
