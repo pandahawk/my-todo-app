@@ -1,0 +1,17 @@
+
+
+----------------------------------
+
+    private readonly todos: Todo[] = [
+    { id: 101, task: 'Buy groceries', completed: false },
+    { id: 102, task: 'Walk the dog', completed: true },
+    { id: 103, task: 'Pay bills', completed: false },
+  ];
+
+  create(todo: Todo) {
+    this.todos.push(todo);
+  }
+
+  findAll(): Todo[] {
+    return this.todos;
+  }
