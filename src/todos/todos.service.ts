@@ -1,28 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { Todo } from './interfaces/todo.interface';
 import { CreateTodoDto } from './dto/create-todo.dto';
-import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
+import { randomUUID } from 'crypto';
+import { TodoNotFoundException } from '../../src/exceptions/todo-not-found.exception';
+import { FindOneTodoDto } from './dto/find-one-todo.dto';
+import { RemoveTodoDto } from './dto/remove-todo.dto';
+import { UpdateTodoParams } from './dto/update-todo-params.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 
-//use DTO pattern to handle data validation in TodosController
 @Injectable()
 export class TodosService {
-  private idCounter = 100;
-  private todos: Todo[] = [];
+  private readonly todos: Todo[] = [];
 
-  /*   constructor() {
-    this.todos = [
-      { id: this.generateId(), task: 'Buy groceries', completed: false },
-      { id: this.generateId(), task: 'Walk the dog', completed: true },
-      { id: this.generateId(), task: 'Pay bills', completed: false },
-    ];
-  } */
+  initializeTodos() {
+    this.todos.push(
+      {
+        id: randomUUID(),
+        task: 'Buy groceries',
+        completed: false,
+      },
+      {
+        id: randomUUID(),
+        task: 'Walk the dog',
+        completed: true,
+      },
+      {
+        id: randomUUID(),
+        task: 'Pay bills',
+        completed: false,
+      },
+    );
+  }
 
-  private generateId(): number {
-    return ++this.idCounter;
+  addTodoForTesting(todo: Todo) {
+    this.todos.push(todo);
   }
 
   create(todo: CreateTodoDto): Todo | undefined {
-    const newTodo: Todo = { ...todo, id: this.generateId(), completed: false };
+    const newTodo: Todo = {
+      ...todo,
+      id: randomUUID(),
+      completed: false,
+    };
     this.todos.push(newTodo);
     return newTodo;
   }
@@ -31,15 +50,48 @@ export class TodosService {
     return this.todos;
   }
 
-  findOne(id: number): Todo {
-    const todo = this.todos.find((todo) => todo.id === id);
-    if (!todo) {
+  findOne(todo: FindOneTodoDto) {
+    const id = todo.id;
+    const todoFound = this.todos.find((todo) => todo.id === id);
+    if (!todoFound) {
       throw new TodoNotFoundException(id);
     }
-    return todo;
+    return todoFound;
   }
 
-  remove(id: number): void {
-    this.todos = this.todos.filter((todo) => todo.id !== id);
+  removeById(removeOneDto: RemoveTodoDto) {
+    const idToRemove = removeOneDto.id;
+    const index = this.todos.findIndex((todo) => todo.id === idToRemove);
+    if (index === -1) {
+      throw new TodoNotFoundException(idToRemove);
+    }
+    const newTodos = this.todos.filter((todo) => todo.id !== idToRemove);
+    (this as any).todos = newTodos;
+  }
+
+  updateById(
+    updateTodoParams: UpdateTodoParams,
+    updateTodoDTO: UpdateTodoDto,
+  ): Todo {
+    const idToUpdate = updateTodoParams.id;
+    const index = this.todos.findIndex((todo) => todo.id === idToUpdate);
+    if (index === -1) {
+      throw new TodoNotFoundException(idToUpdate);
+    }
+    const updatedTodo = {
+      ...this.todos[index],
+      ...(updateTodoDTO.task !== undefined && { task: updateTodoDTO.task }),
+      ...(updateTodoDTO.completed !== undefined && {
+        completed: updateTodoDTO.completed,
+      }),
+    };
+
+    const newTodos = this.todos.map((todo, i) =>
+      i === index ? updatedTodo : todo,
+    );
+
+    (this as any).todos = newTodos;
+
+    return updatedTodo;
   }
 }
