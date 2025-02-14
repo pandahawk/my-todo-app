@@ -1,5 +1,6 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { TodosService } from './todos.service';
+import { Todo } from './interfaces/todo.interface';
 
 @Controller('todos')
 export class TodosController {
@@ -9,8 +10,8 @@ export class TodosController {
     this.todoService = todoService;
   }
 
-  /*   @Get()
+  @Get()
   async findAll(): Promise<Todo[]> {
-    return await this.todoService.findAll();
-  } */
+    return this.todoService.findAll();
+  }
 }
