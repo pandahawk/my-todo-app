@@ -5,8 +5,4 @@ export class CreateTodoDto {
   @IsString()
   @MaxLength(255)
   task: string;
-
-  constructor(task: string) {
-    this.task = task;
-  }
 }
