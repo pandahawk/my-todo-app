@@ -5,8 +5,8 @@ import { Todo } from '../../src/todos/interfaces/todo.interface';
 import { TodoNotFoundException } from '../../src/exceptions/todo-not-found.exception';
 import { FindOneTodoDto } from '../../src/todos/dto/find-one-todo.dto';
 import { RemoveTodoDto } from '../../src/todos/dto/remove-todo.dto';
-import { UpdateTodoParams } from 'todos/dto/update-todo-params.dto';
-import { UpdateTodoDto } from 'todos/dto/update-todo.dto';
+import { UpdateTodoParams } from '../../src/todos/dto/update-todo-params.dto';
+import { UpdateTodoDto } from '../../src/todos/dto/update-todo.dto';
 
 describe('TodosService', () => {
   let service: TodosService;
