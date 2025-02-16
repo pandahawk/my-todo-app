@@ -36,9 +36,9 @@ export class TodosService {
     this.todos.push(todo);
   }
 
-  create(todo: CreateTodoDto): Todo | undefined {
+  create(dto: CreateTodoDto): Todo | undefined {
     const newTodo: Todo = {
-      ...todo,
+      ...dto,
       id: randomUUID(),
       completed: false,
     };
@@ -50,11 +50,10 @@ export class TodosService {
     return this.todos;
   }
 
-  findOne(todo: FindOneTodoDto) {
-    const id = todo.id;
-    const todoFound = this.todos.find((todo) => todo.id === id);
+  findOne(dto: FindOneTodoDto): Todo | undefined {
+    const todoFound = this.todos.find((todo) => todo.id === dto.id);
     if (!todoFound) {
-      throw new TodoNotFoundException(id);
+      throw new TodoNotFoundException(dto.id);
     }
     return todoFound;
   }
