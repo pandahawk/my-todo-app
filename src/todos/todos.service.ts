@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Todo } from './interfaces/todo.interface';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { randomUUID } from 'crypto';
-import { TodoNotFoundException } from '../../src/exceptions/todo-not-found.exception';
+import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
 import { FindOneTodoDto } from './dto/find-one-todo.dto';
 import { RemoveTodoDto } from './dto/remove-todo.dto';
 import { UpdateTodoParams } from './dto/update-todo-params.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 
 @Injectable()
-export class TodosService {
+export class TodosService implements OnModuleInit{
+  onModuleInit() {
+    this.initializeTodos();
+  }
   private readonly todos: Todo[] = [];
 
   initializeTodos() {

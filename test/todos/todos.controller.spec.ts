@@ -9,7 +9,7 @@ import { CreateTodoDto } from '@todos/dto/create-todo.dto';
 import { UpdateTodoDto } from '@todos/dto/update-todo.dto';
 import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
 
-jest.mock('../../src/todos/todos.service');
+jest.mock('@todos/todos.service');
 
 describe('TodosController', () => {
   let controller: TodosController;
