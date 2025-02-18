@@ -50,7 +50,7 @@ export class TodosService {
     return this.todos;
   }
 
-  findOne(dto: FindOneTodoDto): Todo | undefined {
+  findById(dto: FindOneTodoDto): Todo | undefined {
     const todoFound = this.todos.find((todo) => todo.id === dto.id);
     if (!todoFound) {
       throw new TodoNotFoundException(dto.id);
