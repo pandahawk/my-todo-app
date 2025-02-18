@@ -52,12 +52,15 @@
     "typescript": "^5.1.3"
   },
   "jest": {
+    "moduleNameMapper": {
+      "^@todos/(.*)$": "<rootDir>/src/todos/$1",
+      "^@exceptions/(.*)$": "<rootDir>/src/exceptions/$1"
+  },
     "moduleFileExtensions": [
       "js",
       "json",
       "ts"
     ],
-    "rootDir": "test",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

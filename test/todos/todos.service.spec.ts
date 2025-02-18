@@ -1,12 +1,12 @@
 import { TestingModule, Test } from '@nestjs/testing';
-import { CreateTodoDto } from '../../src/todos/dto/create-todo.dto';
-import { TodosService } from '../../src/todos/todos.service';
-import { Todo } from '../../src/todos/interfaces/todo.interface';
-import { TodoNotFoundException } from '../../src/exceptions/todo-not-found.exception';
-import { FindOneTodoDto } from '../../src/todos/dto/find-one-todo.dto';
-import { RemoveTodoDto } from '../../src/todos/dto/remove-todo.dto';
-import { UpdateTodoParams } from '../../src/todos/dto/update-todo-params.dto';
-import { UpdateTodoDto } from '../../src/todos/dto/update-todo.dto';
+import { CreateTodoDto } from '@todos/dto/create-todo.dto';
+import { TodosService } from '@todos/todos.service';
+import { Todo } from '@todos/interfaces/todo.interface';
+import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
+import { FindOneTodoDto } from '@todos/dto/find-one-todo.dto';
+import { RemoveTodoDto } from '@todos/dto/remove-todo.dto';
+import { UpdateTodoParams } from '@todos/dto/update-todo-params.dto';
+import { UpdateTodoDto } from '@todos/dto/update-todo.dto';
 
 describe('TodosService', () => {
   let service: TodosService;
@@ -77,7 +77,7 @@ describe('TodosService', () => {
       const findOneDto: FindOneTodoDto = { id: mockTodo.id };
 
       service.addTodoForTesting(mockTodo);
-      const todoFound = service.findOne(findOneDto);
+      const todoFound = service.findById(findOneDto);
 
       expect(todoFound).toBeDefined();
       expect(todoFound.id).toBe(mockTodo.id);
@@ -88,7 +88,7 @@ describe('TodosService', () => {
     it('should throw a TodoNotfoundException if id not found', () => {
       const invalidId: FindOneTodoDto = { id: 'invalid-id' };
 
-      expect(() => service.findOne(invalidId)).toThrow(TodoNotFoundException);
+      expect(() => service.findById(invalidId)).toThrow(TodoNotFoundException);
     });
   });
 
@@ -179,13 +179,13 @@ describe('TodosService', () => {
 
       const numberTodosBefore = service.findAll().length;
 
-      expect(service.findOne(findOneDto)).toStrictEqual(mockTodo);
+      expect(service.findById(findOneDto)).toStrictEqual(mockTodo);
 
       service.removeById(removeOneDto);
 
       const numberTodosAfter = service.findAll().length;
 
-      expect(() => service.findOne(findOneDto)).toThrow(TodoNotFoundException);
+      expect(() => service.findById(findOneDto)).toThrow(TodoNotFoundException);
       expect(numberTodosAfter).toBe(numberTodosBefore - 1);
     });
 
