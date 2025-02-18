@@ -14,8 +14,11 @@ import { Todo } from './interfaces/todo.interface';
 import { FindOneTodoDto } from './dto/find-one-todo.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { TodoDto } from './dto/todo.dto';
 
 @Controller('todos')
+@ApiTags('todos')
 @UsePipes(ValidationPipe)
 export class TodosController {
   private readonly todosService: TodosService;
@@ -25,6 +28,12 @@ export class TodosController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all todos' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns an array of todos',
+    type: [TodoDto],
+  })
   async findAll(): Promise<Todo[]> {
     return this.todosService.findAll();
   }
