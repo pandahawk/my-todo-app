@@ -19,17 +19,8 @@ describe('TodosController (e2e)', () => {
     await app.init();
 
     service = module.get<TodosService>(TodosService);
-
-    console.log('Service instance:', service); // Check if service is defined
-
-    if (service) {
-      // Only call initia
-      //lizeTodos if the service is defined
-      service.clearForTesting();
-      service.initializeTodos();
-    } else {
-      console.error('TodosService is undefined. Check module configuration.');
-    }
+    service.clearForTesting();
+    service.initializeTodos();
   });
 
   it('/todos (GET)', () => {

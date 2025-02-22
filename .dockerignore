@@ -1,0 +1,9 @@
+node_modules
+.git
+.idea
+dist
+test
+e2e
+*.spec.ts
+*.e2e-spec.ts
+.env
