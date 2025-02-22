@@ -3,10 +3,9 @@ import { CreateTodoDto } from '@todos/dto/create-todo.dto';
 import { TodosService } from '@todos/todos.service';
 import { Todo } from '@todos/interfaces/todo.interface';
 import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
-import { FindOneTodoDto } from '@todos/dto/find-one-todo.dto';
-import { RemoveTodoDto } from '@todos/dto/remove-todo.dto';
-import { UpdateTodoParams } from '@todos/dto/update-todo-params.dto';
 import { UpdateTodoDto } from '@todos/dto/update-todo.dto';
+import { randomUUID } from 'crypto';
+import { TodoParamsDto } from '@todos/dto/todo-params.dto';
 
 describe('TodosService', () => {
   let service: TodosService;
@@ -69,15 +68,15 @@ describe('TodosService', () => {
 
     it('should the todo with the given id', () => {
       const mockTodo: Todo = {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        id: randomUUID(),
         task: 'Test Task',
         completed: false,
       };
 
-      const findOneDto: FindOneTodoDto = { id: mockTodo.id };
+      const paramsDto: TodoParamsDto = { id: mockTodo.id };
 
       service.addTodoForTesting(mockTodo);
-      const todoFound = service.findById(findOneDto);
+      const todoFound = service.findOne(paramsDto.id);
 
       expect(todoFound).toBeDefined();
       expect(todoFound.id).toBe(mockTodo.id);
@@ -86,9 +85,11 @@ describe('TodosService', () => {
     });
 
     it('should throw a TodoNotfoundException if id not found', () => {
-      const invalidId: FindOneTodoDto = { id: 'invalid-id' };
+      const paramsDto: TodoParamsDto = { id: 'invalid-id' };
 
-      expect(() => service.findById(invalidId)).toThrow(TodoNotFoundException);
+      expect(() => service.findOne(paramsDto.id)).toThrow(
+        TodoNotFoundException,
+      );
     });
   });
 
@@ -99,14 +100,14 @@ describe('TodosService', () => {
         task: 'Test Task',
         completed: false,
       };
-      const updateParams: UpdateTodoParams = { id: mockTodo.id };
+      const paramsDto: TodoParamsDto = { id: mockTodo.id };
       const updateDTO: UpdateTodoDto = {
         task: 'updated Task',
         completed: false,
       };
       service.addTodoForTesting(mockTodo);
 
-      const updatedTodo = service.updateById(updateParams, updateDTO);
+      const updatedTodo = service.update(paramsDto.id, updateDTO);
 
       expect(updatedTodo.id).toEqual(mockTodo.id);
       expect(updatedTodo.completed).toEqual(mockTodo.completed);
@@ -115,18 +116,18 @@ describe('TodosService', () => {
 
     it('should update the state of the mockTodo', () => {
       const mockTodo: Todo = {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        id: randomUUID(),
         task: 'Test Task',
         completed: false,
       };
-      const updateParams: UpdateTodoParams = { id: mockTodo.id };
+      const paramsDto: TodoParamsDto = { id: mockTodo.id };
       const updateDTO: UpdateTodoDto = {
         task: undefined,
         completed: true,
       };
       service.addTodoForTesting(mockTodo);
 
-      const updatedTodo = service.updateById(updateParams, updateDTO);
+      const updatedTodo = service.update(paramsDto.id, updateDTO);
 
       expect(updatedTodo.id).toEqual(mockTodo.id);
       expect(updatedTodo.task).toEqual(mockTodo.task);
@@ -135,31 +136,31 @@ describe('TodosService', () => {
 
     it('should not update the mockTodo when no updated values are provided', () => {
       const mockTodo: Todo = {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        id: randomUUID(),
         task: 'Test Task',
         completed: false,
       };
-      const updateParams: UpdateTodoParams = { id: mockTodo.id };
+      const paramsDto: TodoParamsDto = { id: mockTodo.id };
       const updateDTO: UpdateTodoDto = {
         task: undefined,
         completed: undefined,
       };
       service.addTodoForTesting(mockTodo);
 
-      const updatedTodo = service.updateById(updateParams, updateDTO);
+      const updatedTodo = service.update(paramsDto.id, updateDTO);
 
       expect(updatedTodo).toEqual(mockTodo);
     });
 
     it('should throw a TodoNotFoundException for non existing id', () => {
-      const updateTodoParams: UpdateTodoParams = {
+      const paramsDto: TodoParamsDto = {
         id: '00000000-0000-0000-0000-000000000000',
       };
       const updateDTO: UpdateTodoDto = {
         task: undefined,
         completed: undefined,
       };
-      expect(() => service.updateById(updateTodoParams, updateDTO)).toThrow(
+      expect(() => service.update(paramsDto.id, updateDTO)).toThrow(
         TodoNotFoundException,
       );
     });
@@ -168,34 +169,33 @@ describe('TodosService', () => {
   describe('delete', () => {
     it('should delete the mockTodo from service', () => {
       const mockTodo: Todo = {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        id: randomUUID(),
         task: 'Test Task',
         completed: false,
       };
-      const findOneDto: FindOneTodoDto = { id: mockTodo.id };
-      const removeOneDto: RemoveTodoDto = { id: mockTodo.id };
+      const paramsDto: TodoParamsDto = { id: mockTodo.id };
 
       service.addTodoForTesting(mockTodo);
 
       const numberTodosBefore = service.findAll().length;
 
-      expect(service.findById(findOneDto)).toStrictEqual(mockTodo);
+      expect(service.findOne(paramsDto.id)).toStrictEqual(mockTodo);
 
-      service.removeById(removeOneDto);
+      service.remove(paramsDto.id);
 
       const numberTodosAfter = service.findAll().length;
 
-      expect(() => service.findById(findOneDto)).toThrow(TodoNotFoundException);
+      expect(() => service.findOne(paramsDto.id)).toThrow(
+        TodoNotFoundException,
+      );
       expect(numberTodosAfter).toBe(numberTodosBefore - 1);
     });
 
     it('should throw TodoNotFoundException and not modify the remaining todos if the given id is not found', () => {
-      const removeOneDto: RemoveTodoDto = { id: 'invalid' };
+      const paramsDto: TodoParamsDto = { id: 'invalid' };
       const numberTodosBefore = service.findAll().length;
 
-      expect(() => service.removeById(removeOneDto)).toThrow(
-        TodoNotFoundException,
-      );
+      expect(() => service.remove(paramsDto.id)).toThrow(TodoNotFoundException);
 
       const numberTodosAfter = service.findAll().length;
       expect(numberTodosAfter).toEqual(numberTodosBefore);

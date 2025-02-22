@@ -1,11 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class UpdateTodoDto {
   @IsString()
   @MaxLength(255)
   @IsOptional()
-  @ApiProperty({ description: 'The task of the todo', required: false })
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The task description',
+    example: 'Walk the dog',
+    maxLength: 255,
+    required: false,
+  })
   task?: string;
 
   @IsBoolean()

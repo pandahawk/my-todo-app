@@ -5,6 +5,10 @@ export class CreateTodoDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
-  @ApiProperty({ description: 'The task of the todo' })
+  @ApiProperty({
+    description: 'The task description',
+    example: 'Walk the dog',
+    maxLength: 255,
+  })
   task: string;
 }
