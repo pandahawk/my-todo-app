@@ -3,32 +3,33 @@ import { Todo } from './interfaces/todo.interface';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { randomUUID } from 'crypto';
 import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
-import { FindOneTodoDto } from './dto/find-one-todo.dto';
-import { RemoveTodoDto } from './dto/remove-todo.dto';
-import { UpdateTodoParams } from './dto/update-todo-params.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 
 @Injectable()
-export class TodosService implements OnModuleInit{
+export class TodosService implements OnModuleInit {
   onModuleInit() {
     this.initializeTodos();
   }
   private readonly todos: Todo[] = [];
 
+  clearForTesting() {
+    this.todos.length = 0;
+  }
+
   initializeTodos() {
     this.todos.push(
       {
-        id: randomUUID(),
+        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
         task: 'Buy groceries',
         completed: false,
       },
       {
-        id: randomUUID(),
+        id: '1aa8885b-6c71-4649-b541-017498c92a98',
         task: 'Walk the dog',
         completed: true,
       },
       {
-        id: randomUUID(),
+        id: 'a7b8c9d0-1e2f-4345-8679-0123456789ab',
         task: 'Pay bills',
         completed: false,
       },
@@ -39,7 +40,7 @@ export class TodosService implements OnModuleInit{
     this.todos.push(todo);
   }
 
-  create(dto: CreateTodoDto): Todo | undefined {
+  create(dto: CreateTodoDto) {
     const newTodo: Todo = {
       ...dto,
       id: randomUUID(),
@@ -53,32 +54,27 @@ export class TodosService implements OnModuleInit{
     return this.todos;
   }
 
-  findById(dto: FindOneTodoDto): Todo | undefined {
-    const todoFound = this.todos.find((todo) => todo.id === dto.id);
+  findOne(id: string) {
+    const todoFound = this.todos.find((todo) => todo.id === id);
     if (!todoFound) {
-      throw new TodoNotFoundException(dto.id);
+      throw new TodoNotFoundException(id);
     }
     return todoFound;
   }
 
-  removeById(removeOneDto: RemoveTodoDto) {
-    const idToRemove = removeOneDto.id;
-    const index = this.todos.findIndex((todo) => todo.id === idToRemove);
+  remove(id: string) {
+    const index = this.todos.findIndex((todo) => todo.id === id);
     if (index === -1) {
-      throw new TodoNotFoundException(idToRemove);
+      throw new TodoNotFoundException(id);
     }
-    const newTodos = this.todos.filter((todo) => todo.id !== idToRemove);
+    const newTodos = this.todos.filter((todo) => todo.id !== id);
     (this as any).todos = newTodos;
   }
 
-  updateById(
-    updateTodoParams: UpdateTodoParams,
-    updateTodoDTO: UpdateTodoDto,
-  ): Todo {
-    const idToUpdate = updateTodoParams.id;
-    const index = this.todos.findIndex((todo) => todo.id === idToUpdate);
+  update(id: string, updateTodoDTO: UpdateTodoDto): Todo {
+    const index = this.todos.findIndex((todo) => todo.id === id);
     if (index === -1) {
-      throw new TodoNotFoundException(idToUpdate);
+      throw new TodoNotFoundException(id);
     }
     const updatedTodo = {
       ...this.todos[index],

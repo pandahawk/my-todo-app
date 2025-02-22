@@ -3,11 +3,11 @@ import { randomUUID } from 'crypto';
 import { TodosController } from '@todos/todos.controller';
 import { TodosService } from '@todos/todos.service';
 import { Todo } from '@todos/interfaces/todo.interface';
-import { FindOneTodoDto } from '@todos/dto/find-one-todo.dto';
 
 import { CreateTodoDto } from '@todos/dto/create-todo.dto';
 import { UpdateTodoDto } from '@todos/dto/update-todo.dto';
 import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
+import { TodoParamsDto } from '@todos/dto/todo-params.dto';
 
 jest.mock('@todos/todos.service');
 
@@ -54,7 +54,7 @@ describe('TodosController', () => {
     });
   });
 
-  describe('findById', () => {
+  describe('findOne', () => {
     it('should return the todo with the search id', async () => {
       const searchId = randomUUID();
       const mockTodo: Todo = {
@@ -62,26 +62,26 @@ describe('TodosController', () => {
         task: 'test task',
         completed: false,
       };
-      const dto: FindOneTodoDto = { id: searchId };
-      jest.spyOn(mockService, 'findById').mockReturnValue(mockTodo);
+      const dto: TodoParamsDto = { id: searchId };
+      jest.spyOn(mockService, 'findOne').mockReturnValue(mockTodo);
 
-      const result = await controller.findById(searchId);
+      const result = await controller.findOne(dto);
 
       expect(result).toEqual(mockTodo);
-      expect(mockService.findById).toHaveBeenCalledWith(dto);
+      expect(mockService.findOne).toHaveBeenCalledWith(dto.id);
     });
 
     it('should reject the promise when todo is not found', async () => {
       const searchId = randomUUID();
-      const dto: FindOneTodoDto = { id: searchId };
-      jest.spyOn(mockService, 'findById').mockImplementation(() => {
+      const dto: TodoParamsDto = { id: searchId };
+      jest.spyOn(mockService, 'findOne').mockImplementation(() => {
         throw new TodoNotFoundException(searchId);
       });
 
-      const result = controller.findById(searchId);
+      const result = controller.findOne(dto);
 
       expect(result).rejects.toThrow(new TodoNotFoundException(searchId));
-      expect(mockService.findById).toHaveBeenCalledWith(dto);
+      expect(mockService.findOne).toHaveBeenCalledWith(dto.id);
     });
   });
 
@@ -116,20 +116,17 @@ describe('TodosController', () => {
         task: updateDto.task,
         completed: false,
       };
-      jest.spyOn(mockService, 'findById').mockReturnValue(initialTodo);
-
-      const foundTodo = await controller.findById(idToUpdate);
+      jest.spyOn(mockService, 'findOne').mockReturnValue(initialTodo);
+      const paramsDto: TodoParamsDto = { id: idToUpdate };
+      const foundTodo = await controller.findOne(paramsDto);
 
       expect(foundTodo).toEqual(initialTodo);
 
-      jest.spyOn(mockService, 'updateById').mockReturnValue(updatedTodo);
+      jest.spyOn(mockService, 'update').mockReturnValue(updatedTodo);
 
-      const result = await controller.updateById(idToUpdate, updateDto);
+      const result = await controller.update(paramsDto, updateDto);
 
-      expect(mockService.updateById).toHaveBeenCalledWith(
-        { id: idToUpdate },
-        updateDto,
-      );
+      expect(mockService.update).toHaveBeenCalledWith(paramsDto.id, updateDto);
       expect(result).toEqual(updatedTodo);
       expect(result.id).toEqual(foundTodo.id);
     });
@@ -142,25 +139,23 @@ describe('TodosController', () => {
         completed: false,
       };
       const updateDto: UpdateTodoDto = { completed: true };
+      const paramsDto: TodoParamsDto = { id: idToUpdate };
       const updatedTodo: Todo = {
         id: idToUpdate,
         task: 'test task',
         completed: updateDto.completed,
       };
-      jest.spyOn(mockService, 'findById').mockReturnValue(initialTodo);
+      jest.spyOn(mockService, 'findOne').mockReturnValue(initialTodo);
 
-      const foundTodo = await controller.findById(idToUpdate);
+      const foundTodo = await controller.findOne(paramsDto);
 
       expect(foundTodo).toEqual(initialTodo);
 
-      jest.spyOn(mockService, 'updateById').mockReturnValue(updatedTodo);
+      jest.spyOn(mockService, 'update').mockReturnValue(updatedTodo);
 
-      const result = await controller.updateById(idToUpdate, updateDto);
+      const result = await controller.update(paramsDto, updateDto);
 
-      expect(mockService.updateById).toHaveBeenCalledWith(
-        { id: idToUpdate },
-        updateDto,
-      );
+      expect(mockService.update).toHaveBeenCalledWith(paramsDto.id, updateDto);
       expect(result).toEqual(updatedTodo);
       expect(result.id).toEqual(foundTodo.id);
     });
@@ -177,20 +172,18 @@ describe('TodosController', () => {
         task: 'test task',
         completed: false,
       };
-      jest.spyOn(mockService, 'findById').mockReturnValue(initialTodo);
+      const paramsDto: TodoParamsDto = { id: idToUpdate };
+      jest.spyOn(mockService, 'findOne').mockReturnValue(initialTodo);
 
-      const foundTodo = await controller.findById(idToUpdate);
+      const foundTodo = await controller.findOne(paramsDto);
 
       expect(foundTodo).toEqual(initialTodo);
 
-      jest.spyOn(mockService, 'updateById').mockReturnValue(updatedTodo);
+      jest.spyOn(mockService, 'update').mockReturnValue(updatedTodo);
 
-      const result = await controller.updateById(idToUpdate, updateDto);
+      const result = await controller.update(paramsDto, updateDto);
 
-      expect(mockService.updateById).toHaveBeenCalledWith(
-        { id: idToUpdate },
-        updateDto,
-      );
+      expect(mockService.update).toHaveBeenCalledWith(paramsDto.id, updateDto);
       expect(result).toEqual(updatedTodo);
       expect(result.id).toEqual(foundTodo.id);
     });
@@ -199,24 +192,25 @@ describe('TodosController', () => {
   describe('delete', () => {
     it('should delete the mockTodo by id', async () => {
       const idToRemove = randomUUID();
+      const paramsDto: TodoParamsDto = { id: idToRemove };
       const mockTodo: Todo = {
         id: idToRemove,
         task: 'test task',
         completed: false,
       };
 
-      jest.spyOn(mockService, 'findById').mockReturnValueOnce(mockTodo);
+      jest.spyOn(mockService, 'findOne').mockReturnValueOnce(mockTodo);
 
-      const foundTodo = await controller.findById(idToRemove);
+      const foundTodo = await controller.findOne(paramsDto);
       expect(foundTodo).toEqual(mockTodo);
 
-      await controller.removeById(idToRemove);
+      await controller.remove(paramsDto);
 
-      jest.spyOn(mockService, 'findById').mockImplementation(() => {
+      jest.spyOn(mockService, 'findOne').mockImplementation(() => {
         throw new TodoNotFoundException(idToRemove);
       });
 
-      await expect(controller.findById(idToRemove)).rejects.toThrow(
+      await expect(controller.findOne(paramsDto)).rejects.toThrow(
         new TodoNotFoundException(idToRemove),
       );
     });
@@ -224,15 +218,16 @@ describe('TodosController', () => {
     it('should foward the TodoNotFoundException if Todo was not found', async () => {
       const idToRemove = randomUUID();
       const expectedErrorMessage = `Todo with ID ${idToRemove} not found`;
+      const paramsDto: TodoParamsDto = { id: idToRemove };
 
-      jest.spyOn(mockService, 'removeById').mockImplementation(() => {
+      jest.spyOn(mockService, 'remove').mockImplementation(() => {
         throw new TodoNotFoundException(idToRemove);
       });
-      await expect(controller.removeById(idToRemove)).rejects.toThrow(
+      await expect(controller.remove(paramsDto)).rejects.toThrow(
         new TodoNotFoundException(idToRemove),
       );
 
-      await expect(controller.removeById(idToRemove)).rejects.toHaveProperty(
+      await expect(controller.remove(paramsDto)).rejects.toHaveProperty(
         'message',
         expectedErrorMessage,
       );
