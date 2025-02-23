@@ -50,7 +50,7 @@ export class TodosService implements OnModuleInit {
     return newTodo;
   }
 
-  findAll(): Todo[] {
+  findAll() {
     return this.todos;
   }
 
