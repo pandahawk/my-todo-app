@@ -5,10 +5,9 @@
             "server": "localhost",
             "port": 5432,
             "driver": "PostgreSQL",
-            "name": "todo_dev_db",
+            "name": "todo-app",
             "database": "todo_dev_db",
-            "username": "todo_dev_user",
-            "password": "MPUfq2y/MyDdNYUbddCRSIjWmTtD789A7Caw4bw9Jqs="
+            "username": "todo_dev_user"
         }
     ]
 }
