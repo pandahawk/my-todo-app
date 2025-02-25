@@ -14,6 +14,7 @@ services:
       timeout: 5s
       retries: 5
     restart: always # Optional but recommended
+
   api:  # This is the name of your todo app service
     build: .  # Tells Docker Compose to build the image from the Dockerfile in the current directory
     ports:
@@ -23,5 +24,7 @@ services:
         condition: service_healthy # Ensure the database is running before your app starts
     env_file: 
       - .env
+    environment:
+      NODE_ENV: docker
 volumes:
   pgdata:  # Named volume for PostgreSQL data

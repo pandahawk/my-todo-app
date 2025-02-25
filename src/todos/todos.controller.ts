@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
-import { UpdateTodoDto } from './dto/update-todo.dto';
 import {
   ApiBody,
   ApiOperation,
@@ -20,8 +19,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { TodoDto } from './dto/todo.dto';
+import { Todo } from 'entities/todo.entity';
 import { TodoParamsDto } from './dto/todo-params.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 
 @Controller('todos')
 @ApiTags('todos')
@@ -35,10 +35,10 @@ export class TodosController {
     status: 200,
     description:
       'Returns a JSON array of todo objects. Each todo object contains the following properties: id (UUID), task (string), and completed (boolean).',
-    type: [TodoDto],
+    type: [Todo],
   })
   async findAll() {
-    return this.todosService.findAll();
+    return await this.todosService.findAll();
   }
 
   @Get(':id')
@@ -51,10 +51,10 @@ export class TodosController {
     status: 200,
     description:
       'Returns the requested todo object, including its id (UUID), task (string), and completed (boolean) properties.',
-    type: [TodoDto],
+    type: [Todo],
   })
   async findOne(@Param() params: TodoParamsDto) {
-    return this.todosService.findOne(params.id);
+    return await this.todosService.findOne(params.id);
   }
 
   @Post()
@@ -68,10 +68,10 @@ export class TodosController {
     status: 201,
     description:
       'Returns the newly created todo object, including its generated id (UUID), the provided task (string), and completed (boolean, defaults to false).',
-    type: TodoDto,
+    type: Todo,
   })
   async create(@Body() createTodoDto: CreateTodoDto) {
-    return this.todosService.create(createTodoDto);
+    return await this.todosService.create(createTodoDto);
   }
 
   @Patch(':id')
@@ -89,7 +89,7 @@ export class TodosController {
     status: 200,
     description:
       'Returns the updated todo object, including its id (UUID), task (string), and completed (boolean) properties.',
-    type: [TodoDto],
+    type: [Todo],
   })
   async update(
     @Param() params: TodoParamsDto,
@@ -111,6 +111,6 @@ export class TodosController {
   })
   @HttpCode(204)
   async remove(@Param() params: TodoParamsDto) {
-    this.todosService.remove(params.id);
+     await this.todosService.remove(params.id);
   }
 }

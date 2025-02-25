@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
 import { TodosController } from '@todos/todos.controller';
 import { TodosService } from '@todos/todos.service';
-import { Todo } from '@todos/interfaces/todo.interface';
 
 import { CreateTodoDto } from '@todos/dto/create-todo.dto';
 import { UpdateTodoDto } from '@todos/dto/update-todo.dto';
