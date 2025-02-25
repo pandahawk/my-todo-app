@@ -13,6 +13,7 @@
     "paths": {
       "@exceptions/*": ["exceptions/*"], // Alias for exceptions
       "@todos/*": ["todos/*"], // Alias for todos (if needed)
+      "@entities/*": ["entities/*"],
       // ... other aliases as needed
     },
     "incremental": true,

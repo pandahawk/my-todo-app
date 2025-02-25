@@ -1,15 +1,18 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Todo } from './interfaces/todo.interface';
+import { Injectable } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
-import { randomUUID } from 'crypto';
 import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { Todo } from '@entities/todo.entity';
 
 @Injectable()
-export class TodosService implements OnModuleInit {
-  onModuleInit() {
-    this.initializeTodos();
-  }
+export class TodosService {
+  constructor(
+    @InjectRepository(Todo)
+    private readonly todosRepository: Repository<Todo>,
+  ) {}
+
   private readonly todos: Todo[] = [];
 
   clearForTesting() {
@@ -40,56 +43,42 @@ export class TodosService implements OnModuleInit {
     this.todos.push(todo);
   }
 
-  create(dto: CreateTodoDto) {
-    const newTodo: Todo = {
-      ...dto,
-      id: randomUUID(),
-      completed: false,
-    };
-    this.todos.push(newTodo);
-    return newTodo;
+  async create(dto: CreateTodoDto) {
+    const newTodo = this.todosRepository.create(dto);
+    return await this.todosRepository.save(newTodo);
   }
 
-  findAll() {
-    return this.todos;
+  async findAll() {
+    return await this.todosRepository.find();
   }
 
-  findOne(id: string) {
-    const todoFound = this.todos.find((todo) => todo.id === id);
-    if (!todoFound) {
+  async findOne(id: string) {
+    const todo = await this.todosRepository.findOne({ where: { id } });
+    if (!todo) {
       throw new TodoNotFoundException(id);
     }
-    return todoFound;
+    return todo;
   }
 
-  remove(id: string) {
-    const index = this.todos.findIndex((todo) => todo.id === id);
-    if (index === -1) {
+  async remove(id: string) {
+    const result = await this.todosRepository.delete(id);
+    if (result.affected === 0) {
       throw new TodoNotFoundException(id);
     }
-    const newTodos = this.todos.filter((todo) => todo.id !== id);
-    (this as any).todos = newTodos;
   }
 
-  update(id: string, updateTodoDTO: UpdateTodoDto): Todo {
-    const index = this.todos.findIndex((todo) => todo.id === id);
-    if (index === -1) {
+  async update(id: string, dto: UpdateTodoDto) {
+
+    const hasValuesToUpdate = Object.keys(dto).length > 0;
+
+    if (!hasValuesToUpdate) {
+      return await this.findOne(id);
+    }
+
+    const result = await this.todosRepository.update(id, dto);
+    if (result.affected === 0) {
       throw new TodoNotFoundException(id);
     }
-    const updatedTodo = {
-      ...this.todos[index],
-      ...(updateTodoDTO.task !== undefined && { task: updateTodoDTO.task }),
-      ...(updateTodoDTO.completed !== undefined && {
-        completed: updateTodoDTO.completed,
-      }),
-    };
-
-    const newTodos = this.todos.map((todo, i) =>
-      i === index ? updatedTodo : todo,
-    );
-
-    (this as any).todos = newTodos;
-
-    return updatedTodo;
+    return await this.findOne(id);
   }
 }
