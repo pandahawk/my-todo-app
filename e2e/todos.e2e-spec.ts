@@ -19,8 +19,8 @@ describe('TodosController (e2e)', () => {
     await app.init();
 
     service = module.get<TodosService>(TodosService);
-    service.clearForTesting();
-    service.initializeTodos();
+    // service.clearForTesting();
+    // service.initializeTodos();
   });
 
   it('/todos (GET)', () => {

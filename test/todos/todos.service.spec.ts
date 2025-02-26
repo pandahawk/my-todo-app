@@ -35,11 +35,10 @@ describe('TodosService', () => {
 
     service = module.get<TodosService>(TodosService);
     todosRepository = mockRepository;
-    service.initializeTodos();
   });
 
   describe('create', () => {
-    it('should create a new todo with a v4 random UUID', async () => {
+    it('should create a new todo', async () => {
       const createTodoDto: CreateTodoDto = { task: 'Buy groceries' };
 
       todosRepository.save.mockImplementation((todo:Todo) => {
@@ -47,7 +46,7 @@ describe('TodosService', () => {
       });
 
       todosRepository.create.mockImplementation((dto: CreateTodoDto) => {
-        return { id: randomUUID(), task: dto.task, completed: false };
+        return { id: 1, task: dto.task, completed: false };
       });
 
       const newTodo = await service.create(createTodoDto);
@@ -55,15 +54,12 @@ describe('TodosService', () => {
       expect(todosRepository.create).toHaveBeenCalledWith(createTodoDto);
       expect(newTodo).toBeDefined();
       expect(newTodo.id).toBeDefined(); // Check that an ID is generated
-      expect(typeof newTodo.id).toBe('string'); // Check that the ID is a string
+      expect(typeof newTodo.id).toBe('number'); // Check that the ID is a string
       expect(newTodo.task).toBe('Buy groceries');
       expect(newTodo.completed).toBe(false);
-      expect(newTodo.id).toMatch(
-        /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-      );
     });
 
-    it('create two todos with different unique UUIDs', async () => {
+    it('create two todos with different unique ids', async () => {
       const createTodoDto1: CreateTodoDto = { task: 'Buy groceries' };
       const createTodoDto2: CreateTodoDto = { task: 'Play with Caleb' };
 
@@ -71,16 +67,15 @@ describe('TodosService', () => {
         return Promise.resolve(todo);
       });
 
-      todosRepository.create.mockImplementation((dto: CreateTodoDto) => {
-        return { id: randomUUID(), task: dto.task, completed: false };
-      });
+      todosRepository.create.mockReturnValueOnce({ id: 1, task: createTodoDto1.task, completed: false });
+      todosRepository.create.mockReturnValueOnce({ id: 2, task: createTodoDto2.task, completed: false });
 
 
       const newTodo1 = await service.create(createTodoDto1);
 
       expect(newTodo1).toBeDefined();
       expect(newTodo1.id).toBeDefined(); // Check that an ID is generated
-      expect(typeof newTodo1.id).toBe('string'); // Check that the ID is a string
+      expect(typeof newTodo1.id).toBe('number'); // Check that the ID is a string
       expect(newTodo1.task).toBe('Buy groceries');
       expect(newTodo1.completed).toBeFalsy();
       expect(todosRepository.create).toHaveBeenCalledWith(createTodoDto1);
@@ -89,7 +84,7 @@ describe('TodosService', () => {
 
       expect(newTodo2).toBeDefined();
       expect(newTodo2.id).toBeDefined(); // Check that an ID is generated
-      expect(typeof newTodo2.id).toBe('string'); // Check that the ID is a string
+      expect(typeof newTodo2.id).toBe('number'); // Check that the ID is a string
       expect(newTodo2.task).toBe('Play with Caleb');
       expect(newTodo2.completed).toBeFalsy();
       expect(todosRepository.create).toHaveBeenCalledWith(createTodoDto2);
@@ -101,8 +96,8 @@ describe('TodosService', () => {
   describe('read', () => {
     it('should return all todos', async () => {
       const mockTodos: Todo[] = [
-        { id: '1', task: 'Task 1', completed: false },
-        { id: '2', task: 'Task 2', completed: true },
+        { id: 1, task: 'Task 1', completed: false },
+        { id: 2, task: 'Task 2', completed: true },
       ];
 
       jest.spyOn(todosRepository, 'find').mockResolvedValue(mockTodos);
@@ -115,7 +110,7 @@ describe('TodosService', () => {
 
     it('should the todo with the given id', async () => {
       const mockTodo: Todo = {
-        id: randomUUID(),
+        id: 1,
         task: 'Test Task',
         completed: false,
       };
@@ -134,7 +129,7 @@ describe('TodosService', () => {
     });
 
     it('should throw a TodoNotfoundException if id not found', async () => {
-      const paramsDto: TodoParamsDto = { id: randomUUID() };
+      const paramsDto: TodoParamsDto = { id: 100};
 
       todosRepository.findOne.mockImplementation(() => {
         throw new TodoNotFoundException(paramsDto.id);
@@ -149,7 +144,7 @@ describe('TodosService', () => {
   describe('update', () => {
     it('should update task of the mockTodo', async () => {
       const mockTodo: Todo = {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        id: 1,
         task: 'Test Task',
         completed: false,
       };
@@ -160,7 +155,7 @@ describe('TodosService', () => {
       };
 
       const expected: Todo = {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        id: 1,
         task: 'updated Task',
         completed: false,
       };
@@ -181,7 +176,7 @@ describe('TodosService', () => {
 
     it('should update the state of the mockTodo', async () => {
       const mockTodo: Todo = {
-        id: randomUUID(),
+        id: 1,
         task: 'Test Task',
         completed: false,
       };
@@ -209,7 +204,7 @@ describe('TodosService', () => {
 
     it('should not update the mockTodo when no updated values are provided', async () => {
       const mockTodo: Todo = {
-        id: randomUUID(),
+        id: 1,
         task: 'Test Task',
         completed: false,
       };
@@ -225,7 +220,7 @@ describe('TodosService', () => {
 
     it('should throw a TodoNotFoundException for non existing id', async () => {
       const paramsDto: TodoParamsDto = {
-        id: '00000000-0000-0000-0000-000000000000',
+        id: 1,
       };
       const updateDTO: UpdateTodoDto = {};
 
@@ -244,12 +239,12 @@ describe('TodosService', () => {
   describe('delete', () => {
     it('should delete the mockTodo from service', async () => {
       const mockTodo1: Todo = {
-        id: randomUUID(),
+        id: 1,
         task: 'Test Task',
         completed: false,
       };
       const mockTodo2: Todo = {
-        id: randomUUID(),
+        id: 2,
         task: 'Test Task',
         completed: false,
       };
@@ -274,11 +269,11 @@ describe('TodosService', () => {
 
     it('should throw TodoNotFoundException and not modify the remaining todos if the given id is not found', async () => {
       const mockTodo: Todo = {
-        id: randomUUID(),
+        id: 1,
         task: 'Test Task',
         completed: false,
       };
-      const paramsDto: TodoParamsDto = { id: randomUUID() };
+      const paramsDto: TodoParamsDto = { id: 100};
 
       todosRepository.find.mockResolvedValue([mockTodo]);
       todosRepository.delete.mockResolvedValue({ affected: 0, raw: [] });

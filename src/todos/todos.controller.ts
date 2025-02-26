@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UsePipes,
@@ -19,13 +20,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Todo } from 'entities/todo.entity';
 import { TodoParamsDto } from './dto/todo-params.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { Todo } from '@entities/todo.entity';
 
 @Controller('todos')
 @ApiTags('todos')
-@UsePipes(ValidationPipe)
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
@@ -34,7 +34,7 @@ export class TodosController {
   @ApiResponse({
     status: 200,
     description:
-      'Returns a JSON array of todo objects. Each todo object contains the following properties: id (UUID), task (string), and completed (boolean).',
+      'Returns a JSON array of todo objects. Each todo object contains the following properties: ID (int), task (string), and completed (boolean).',
     type: [Todo],
   })
   async findAll() {
@@ -45,16 +45,17 @@ export class TodosController {
   @ApiOperation({ summary: 'Get a todo by ID' })
   @ApiParam({
     name: 'id',
-    description: 'The UUID (v4) of the todo to retrieve.',
+    description: 'ID (int) of the todo to retrieve.',
   })
   @ApiResponse({
     status: 200,
     description:
-      'Returns the requested todo object, including its id (UUID), task (string), and completed (boolean) properties.',
+      'Returns the requested todo object, including its id (int), task (string), and completed (boolean) properties.',
     type: [Todo],
   })
   async findOne(@Param() params: TodoParamsDto) {
-    return await this.todosService.findOne(params.id);
+    console.log(params)
+    return this.todosService.findOne(+params.id);
   }
 
   @Post()
@@ -67,7 +68,7 @@ export class TodosController {
   @ApiResponse({
     status: 201,
     description:
-      'Returns the newly created todo object, including its generated id (UUID), the provided task (string), and completed (boolean, defaults to false).',
+      'Returns the newly created todo object, including its generated id (int), the provided task (string), and completed (boolean, defaults to false).',
     type: Todo,
   })
   async create(@Body() createTodoDto: CreateTodoDto) {
@@ -78,7 +79,7 @@ export class TodosController {
   @ApiOperation({ summary: 'Update a todo by ID' })
   @ApiParam({
     name: 'id',
-    description: 'The UUID (v4) of the todo to update.',
+    description: 'The id (int) of the todo to update.',
   })
   @ApiBody({
     description:
@@ -88,13 +89,14 @@ export class TodosController {
   @ApiResponse({
     status: 200,
     description:
-      'Returns the updated todo object, including its id (UUID), task (string), and completed (boolean) properties.',
+      'Returns the updated todo object, including its id (int), task (string), and completed (boolean) properties.',
     type: [Todo],
   })
   async update(
-    @Param() params: TodoParamsDto,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateTodoDto: UpdateTodoDto,
   ) {
+    const params: TodoParamsDto = { id };
     return this.todosService.update(params.id, updateTodoDto);
   }
 
@@ -102,7 +104,7 @@ export class TodosController {
   @ApiOperation({ summary: 'Delete a todo by ID' })
   @ApiParam({
     name: 'id',
-    description: 'The UUID (v4) of the todo to delete.',
+    description: 'The id (int) of the todo to delete.',
   })
   @ApiResponse({
     status: 204,
@@ -110,7 +112,8 @@ export class TodosController {
     type: undefined,
   })
   @HttpCode(204)
-  async remove(@Param() params: TodoParamsDto) {
-     await this.todosService.remove(params.id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const params: TodoParamsDto = { id };
+    await this.todosService.remove(params.id);
   }
 }
