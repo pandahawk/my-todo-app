@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class SeedTodos1740478876753 implements MigrationInterface {
@@ -6,16 +5,16 @@ export class SeedTodos1740478876753 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Example todos
         const todos = [
-            { id: randomUUID(), task: 'Grocery Shopping', completed: false },
-            { id: randomUUID(), task: 'Book Doctor Appointment', completed: true },
-            { id: randomUUID(), task: 'Pay Bills', completed: false },
-            { id: randomUUID(), task: 'Pick up Dry Cleaning', completed: true },
-            { id: randomUUID(), task: 'Call Mom', completed: false },
-            { id: randomUUID(), task: 'Schedule Team Meeting', completed: true },
-            { id: randomUUID(), task: 'Write Project Proposal', completed: false },
-            { id: randomUUID(), task: 'Buy Birthday Gift for Dad', completed: false },
-            { id: randomUUID(), task: 'Finish Reading Book', completed: true },
-            { id: randomUUID(), task: 'Water the Plants', completed: false },
+            { task: 'Grocery Shopping', completed: false },
+            { task: 'Book Doctor Appointment', completed: true },
+            { task: 'Pay Bills', completed: false },
+            { task: 'Pick up Dry Cleaning', completed: true },
+            { task: 'Call Mom', completed: false },
+            { task: 'Schedule Team Meeting', completed: true },
+            { task: 'Write Project Proposal', completed: false },
+            { task: 'Buy Birthday Gift for Dad', completed: false },
+            { task: 'Finish Reading Book', completed: true },
+            { task: 'Water the Plants', completed: false },
         ];
 
         // Insert the todos into the database

@@ -1,8 +1,11 @@
-import { IsUUID } from 'class-validator';
+import { IsNumber, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class TodoParamsDto {
-  @IsUUID('4') // Validate for UUID version 4
-  @ApiProperty({ description: 'The UUID of the todo' })
-  id: string;
+  @ApiProperty({ description: 'The int ID of the todo' })
+  @IsNumber()
+  @Transform(({ value }) => +value) 
+  @Min(1)
+  id: number;
 }

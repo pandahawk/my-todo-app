@@ -7,7 +7,6 @@ services:
       - "5432:5432"  # Load environment variables from .env file
     volumes:
       - pgdata:/var/lib/postgresql/data  # Persist data across container restarts
-      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql # Mount the script
     healthcheck: # Optional but recommended
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s

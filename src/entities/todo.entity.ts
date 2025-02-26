@@ -1,22 +1,20 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { randomUUID } from "crypto";
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsPositive } from 'class-validator';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Todo{
-    @PrimaryColumn('uuid')
-    @ApiProperty({ description: 'The uuid of the todo' })
-    id: string;
+export class Todo {
+  @PrimaryGeneratedColumn() // No type specified, defaults to integer
+  @ApiProperty({ description: 'The integer ID of the todo' })
+  @IsNumber()
+  @IsPositive()
+  id: number; // Type should be number
 
-    @Column()
-    @ApiProperty({ description: 'The task of the todo' })
-    task: string;
+  @Column()
+  @ApiProperty({ description: 'The task of the todo' })
+  task: string;
 
-    @Column({ default: false }) 
-    @ApiProperty({ description: 'Whether the todo is completed' })
-    completed: boolean;
-
-    constructor() {
-        this.id = randomUUID(); // Generate UUID using crypto
-      }
+  @Column({ default: false })
+  @ApiProperty({ description: 'Whether the todo is completed' })
+  completed: boolean;
 }

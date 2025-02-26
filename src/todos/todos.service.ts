@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,25 +19,25 @@ export class TodosService {
     this.todos.length = 0;
   }
 
-  initializeTodos() {
-    this.todos.push(
-      {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        task: 'Buy groceries',
-        completed: false,
-      },
-      {
-        id: '1aa8885b-6c71-4649-b541-017498c92a98',
-        task: 'Walk the dog',
-        completed: true,
-      },
-      {
-        id: 'a7b8c9d0-1e2f-4345-8679-0123456789ab',
-        task: 'Pay bills',
-        completed: false,
-      },
-    );
-  }
+  // initializeTodos() {
+  //   this.todos.push(
+  //     {
+  //       id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+  //       task: 'Buy groceries',
+  //       completed: false,
+  //     },
+  //     {
+  //       id: '1aa8885b-6c71-4649-b541-017498c92a98',
+  //       task: 'Walk the dog',
+  //       completed: true,
+  //     },
+  //     {
+  //       id: 'a7b8c9d0-1e2f-4345-8679-0123456789ab',
+  //       task: 'Pay bills',
+  //       completed: false,
+  //     },
+  //   );
+  // }
 
   addTodoForTesting(todo: Todo) {
     this.todos.push(todo);
@@ -52,7 +52,7 @@ export class TodosService {
     return await this.todosRepository.find();
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const todo = await this.todosRepository.findOne({ where: { id } });
     if (!todo) {
       throw new TodoNotFoundException(id);
@@ -60,14 +60,14 @@ export class TodosService {
     return todo;
   }
 
-  async remove(id: string) {
+  async remove(id: number) {
     const result = await this.todosRepository.delete(id);
     if (result.affected === 0) {
       throw new TodoNotFoundException(id);
     }
   }
 
-  async update(id: string, dto: UpdateTodoDto) {
+  async update(id: number, dto: UpdateTodoDto) {
 
     const hasValuesToUpdate = Object.keys(dto).length > 0;
 

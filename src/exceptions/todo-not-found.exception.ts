@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 
 export class TodoNotFoundException extends NotFoundException {
-  constructor(id: string) {
+  constructor(id: number) {
     super(`Todo with ID ${id} not found`);
     this.name = 'TodoNotFoundException';
   }
