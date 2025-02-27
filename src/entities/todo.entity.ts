@@ -8,9 +8,9 @@ export class Todo {
   @ApiProperty({ description: 'The integer ID of the todo' })
   @IsNumber()
   @IsPositive()
-  id: number; // Type should be number
+  id?: number; // Type should be number
 
-  @Column()
+  @Column({ type: 'text', nullable: false })
   @ApiProperty({ description: 'The task of the todo' })
   task: string;
 

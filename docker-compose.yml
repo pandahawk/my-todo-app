@@ -1,29 +1,46 @@
 services:
   postgres:
-    image: postgres:17  # Or specify your desired PostgreSQL version
-    env_file: 
-      - .env
+    image: postgres:17 # Or specify your desired PostgreSQL version
+    env_file:
+      - .env # Load environment variables from .env file
     ports:
-      - "5432:5432"  # Load environment variables from .env file
+      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data  # Persist data across container restarts
+      - pgdata:/var/lib/postgresql/data # Persist data across container restarts
     healthcheck: # Optional but recommended
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U todo_dev_user -d todo_dev_db"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: always # Optional but recommended
 
-  api:  # This is the name of your todo app service
-    build: .  # Tells Docker Compose to build the image from the Dockerfile in the current directory
+  postgres_test:
+    image: postgres:17 # Or specify your desired PostgreSQL version
+    env_file:
+      - .env.test # Load environment variables from .env file
     ports:
-      - "3000:3000"  # Map port 8080 on your host machine to port 8080 in the container (adjust if necessary)
+      - "5433:5432"
+    volumes:
+      - pgdata_test:/var/lib/postgresql/data # Persist data across container restarts
+    healthcheck: # Optional but recommended
+      test: ["CMD-SHELL", "pg_isready -U todo_test_user -d todo_test_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always # Optional but recommended
+
+  api: # This is the name of your todo app service
+    build: . # Tells Docker Compose to build the image from the Dockerfile in the current directory
+    ports:
+      - "3000:3000" # Map port 3000 on your host machine to port 3000 in the container (adjust if necessary)
     depends_on:
       postgres:
         condition: service_healthy # Ensure the database is running before your app starts
-    env_file: 
+    env_file:
       - .env
     environment:
       NODE_ENV: docker
+    restart: always
 volumes:
-  pgdata:  # Named volume for PostgreSQL data
+  pgdata: # Named volume for PostgreSQL data
+  pgdata_test:
