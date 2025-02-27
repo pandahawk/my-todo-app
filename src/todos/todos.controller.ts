@@ -54,8 +54,7 @@ export class TodosController {
     type: [Todo],
   })
   async findOne(@Param() params: TodoParamsDto) {
-    console.log(params)
-    return this.todosService.findOne(+params.id);
+    return this.todosService.findOne(params.id);
   }
 
   @Post()
@@ -93,10 +92,9 @@ export class TodosController {
     type: [Todo],
   })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param() params: TodoParamsDto,
     @Body() updateTodoDto: UpdateTodoDto,
   ) {
-    const params: TodoParamsDto = { id };
     return this.todosService.update(params.id, updateTodoDto);
   }
 
@@ -112,8 +110,7 @@ export class TodosController {
     type: undefined,
   })
   @HttpCode(204)
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    const params: TodoParamsDto = { id };
+  async remove(@Param() params: TodoParamsDto) {
     await this.todosService.remove(params.id);
   }
 }

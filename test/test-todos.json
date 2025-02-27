@@ -1,0 +1,12 @@
+[
+    { "task": "Buy groceries", "completed": false },
+    { "task": "Finish writing blog post", "completed": true },
+    { "task": "Schedule dentist appointment", "completed": false },
+    { "task": "Read 20 pages of a book", "completed": true },
+    { "task": "Practice coding challenges", "completed": false },
+    { "task": "Water the plants", "completed": true },
+    { "task": "Plan weekend trip", "completed": false },
+    { "task": "Clean the workspace", "completed": false },
+    { "task": "Reply to pending emails", "completed": true },
+    { "task": "Go for a 30-minute run", "completed": false }
+  ]

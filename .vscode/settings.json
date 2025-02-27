@@ -7,7 +7,18 @@
             "driver": "PostgreSQL",
             "name": "todo-app",
             "database": "todo_dev_db",
-            "username": "todo_dev_user"
+            "username": "todo_dev_user",
+            "password": "todo_dev_password"
+        },
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5433,
+            "driver": "PostgreSQL",
+            "name": "todo-app-test",
+            "database": "todo_test_db",
+            "username": "todo_test_user",
+            "password": "todo_test_password"
         }
     ]
 }
