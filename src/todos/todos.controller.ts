@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   HttpCode,
+  Logger,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   UsePipes,
@@ -24,9 +24,12 @@ import { TodoParamsDto } from './dto/todo-params.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from '@entities/todo.entity';
 
+@UsePipes(new ValidationPipe({transform: true}))
 @Controller('todos')
 @ApiTags('todos')
 export class TodosController {
+  private readonly logger = new Logger(TodosController.name);
+  
   constructor(private readonly todosService: TodosService) {}
 
   @Get()
@@ -38,6 +41,7 @@ export class TodosController {
     type: [Todo],
   })
   async findAll() {
+    this.logger.log('findAll()...');
     return await this.todosService.findAll();
   }
 
@@ -54,6 +58,7 @@ export class TodosController {
     type: [Todo],
   })
   async findOne(@Param() params: TodoParamsDto) {
+    this.logger.log('findOne()...')
     return this.todosService.findOne(params.id);
   }
 
@@ -71,6 +76,7 @@ export class TodosController {
     type: Todo,
   })
   async create(@Body() createTodoDto: CreateTodoDto) {
+    this.logger.log('create()...')
     return await this.todosService.create(createTodoDto);
   }
 

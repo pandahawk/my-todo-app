@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { TodoNotFoundException } from '@exceptions/todo-not-found.exception';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,40 +8,12 @@ import { Todo } from '@entities/todo.entity';
 
 @Injectable()
 export class TodosService {
+  private readonly logger = new Logger(TodosService.name);
+
   constructor(
     @InjectRepository(Todo)
     private readonly todosRepository: Repository<Todo>,
   ) {}
-
-  private readonly todos: Todo[] = [];
-
-  clearForTesting() {
-    this.todos.length = 0;
-  }
-
-  // initializeTodos() {
-  //   this.todos.push(
-  //     {
-  //       id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-  //       task: 'Buy groceries',
-  //       completed: false,
-  //     },
-  //     {
-  //       id: '1aa8885b-6c71-4649-b541-017498c92a98',
-  //       task: 'Walk the dog',
-  //       completed: true,
-  //     },
-  //     {
-  //       id: 'a7b8c9d0-1e2f-4345-8679-0123456789ab',
-  //       task: 'Pay bills',
-  //       completed: false,
-  //     },
-  //   );
-  // }
-
-  addTodoForTesting(todo: Todo) {
-    this.todos.push(todo);
-  }
 
   async create(dto: CreateTodoDto) {
     const newTodo = this.todosRepository.create(dto);
@@ -49,6 +21,15 @@ export class TodosService {
   }
 
   async findAll() {
+    // for (let i = 0; i < 10; i++) {
+    //   this.logger.log(`Fibonacci call nr.${i + 1}`);
+    //   await new Promise((resolve) => {
+    //     process.nextTick(() => {
+    //       this.calculateFibonacci(40);
+    //       setTimeout(resolve, 200);
+    //     });
+    //   });
+    // }
     return await this.todosRepository.find();
   }
 
@@ -68,7 +49,6 @@ export class TodosService {
   }
 
   async update(id: number, dto: UpdateTodoDto) {
-
     const hasValuesToUpdate = Object.keys(dto).length > 0;
 
     if (!hasValuesToUpdate) {
@@ -81,4 +61,11 @@ export class TodosService {
     }
     return await this.findOne(id);
   }
+
+  // private calculateFibonacci(n: number): number {
+  //   if (n <= 1) {
+  //     return n;
+  //   }
+  //   return this.calculateFibonacci(n - 1) + this.calculateFibonacci(n - 2);
+  // }
 }
