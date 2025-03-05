@@ -1,5 +1,6 @@
 services:
   postgres:
+    container_name: pg
     image: postgres:17 # Or specify your desired PostgreSQL version
     env_file:
       - .env # Load environment variables from .env file
@@ -15,6 +16,7 @@ services:
     restart: always # Optional but recommended
 
   postgres_test:
+    container_name: pg_test
     image: postgres:17 # Or specify your desired PostgreSQL version
     env_file:
       - .env.test # Load environment variables from .env file
@@ -30,6 +32,7 @@ services:
     restart: always # Optional but recommended
 
   api: # This is the name of your todo app service
+    container_name: api
     build: . # Tells Docker Compose to build the image from the Dockerfile in the current directory
     ports:
       - "3000:3000" # Map port 3000 on your host machine to port 3000 in the container (adjust if necessary)
@@ -41,6 +44,30 @@ services:
     environment:
       NODE_ENV: docker
     restart: always
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    restart: always
+
 volumes:
   pgdata: # Named volume for PostgreSQL data
   pgdata_test:
+      

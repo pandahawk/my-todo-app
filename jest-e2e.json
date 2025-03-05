@@ -4,5 +4,10 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@todos/(.*)$": "<rootDir>/src/todos/$1",
+    "^@exceptions/(.*)$": "<rootDir>/src/exceptions/$1",
+    "^@entities/(.*)$": "<rootDir>/src/entities/$1"
   }
 }
