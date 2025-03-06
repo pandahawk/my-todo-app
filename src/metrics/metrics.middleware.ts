@@ -23,7 +23,7 @@ export class MetricsMiddleware implements NestMiddleware {
       name: 'http_request_duration_seconds',
       help: 'Duration of HTTP requests in seconds',
       labelNames: ['method', 'route', 'status_code'],
-      buckets: [0.01, 0.02, 0.05, 0.1, 0.3, 1.5, 5, 10], // Buckets for response time
+      buckets: [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.3, 1.5, 5, 10], // Buckets for response time
     });
   }
 

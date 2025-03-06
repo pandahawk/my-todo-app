@@ -45,28 +45,6 @@ services:
       NODE_ENV: docker
     restart: always
 
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    depends_on:
-      - api
-    restart: always
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    volumes:
-      - ./grafana-data:/var/lib/grafana
-    ports:
-      - "3001:3000"
-    depends_on:
-      - prometheus
-    restart: always
-
 volumes:
   pgdata: # Named volume for PostgreSQL data
   pgdata_test:
