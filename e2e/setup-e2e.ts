@@ -3,7 +3,6 @@ import { TestingModule, Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TodosModule } from '@todos/todos.module';
 import { DataSource } from 'typeorm';
-import { dbConfigForApp } from '../config/db.config';
 import * as dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.test' });
@@ -17,10 +16,11 @@ export async function setupE2E(): Promise<{
   const module: TestingModule = await Test.createTestingModule({
     imports: [
       TypeOrmModule.forRoot({
-        ...dbConfigForApp(),
-        autoLoadEntities: true,
-        synchronize: true, // Auto-create tables (disable in production)
-        dropSchema: true, // Drop schema before tests
+        type: 'sqlite',
+        database: ':memory:',
+        entities: [__dirname + '/../src/entities/*.entity{.ts,.js}'], // Adjust path if needed
+        synchronize: true, // Automatically create tables
+        dropSchema: true, // Drop schema on each test run
       }),
       TodosModule,
     ],

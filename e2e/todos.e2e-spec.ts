@@ -20,35 +20,23 @@ describe('TodosController (e2e)', () => {
 
     app = setup.app;
     dataSource = setup.dataSource;
-    logger.log('e2e setup done.'); // <== This should always log unless setupE2E() fails.
+    logger.log('e2e setup done.');
   });
 
   beforeEach(async () => {
-    if (!dataSource) {
-      logger.error(' DataSource is undefined in beforeEach!');
-    }
-    // Reset database manually instead of relying on synchronize(true)
-    await dataSource.query(`DROP TABLE IF EXISTS "todo" CASCADE;`);
-    await dataSource.query(`DROP SEQUENCE IF EXISTS todo_id_seq;`);
-
-    // Recreate tables
-    await dataSource.query(`
-      CREATE SEQUENCE IF NOT EXISTS todo_id_seq;
-      CREATE TABLE "todo" (
-        "id" INTEGER PRIMARY KEY DEFAULT nextval('todo_id_seq'),
-        "task" VARCHAR(255) NOT NULL,
-        "completed" BOOLEAN NOT NULL DEFAULT false
-      );
-      ALTER SEQUENCE todo_id_seq RESTART WITH 101;
-    `);
-
     const repository = dataSource.getRepository(Todo);
+
+    // Clear existing data
+    await repository.clear();
+
+    // Reset auto-increment value
+    await dataSource.query(`DELETE FROM sqlite_sequence WHERE name = 'todo'`);
+    await dataSource.query(`INSERT INTO sqlite_sequence (name, seq) VALUES ('todo', 100)`);
 
     const todosFilePath = path.join(__dirname, '../resources/test-todos.json');
     const todosData: Todo[] = JSON.parse(
       fs.readFileSync(todosFilePath, 'utf-8'),
     );
-
     await repository.save(todosData);
   });
 
@@ -251,6 +239,8 @@ describe('TodosController (e2e)', () => {
 
   it('/todos/:id (DELETE) - should delete the todo by ID', async () => {
     const nonExistingId = 106;
+    const todos = await dataSource.getRepository(Todo).find(); // Await the find method
+    logger.log(todos); // Log the resolved value
     return request(app.getHttpServer())
       .delete(`/todos/${nonExistingId}`)
       .expect(404)
